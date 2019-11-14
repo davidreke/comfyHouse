@@ -1,3 +1,12 @@
+const client = contentful.createClient({
+  // This is the space ID. A space is like a project folder in Contentful terms
+  space: "xxy515yhhwmw",
+  // This is the access token for this space. Normally you get both ID and the token in the Contentful web app
+  accessToken: "eptdXUEkdx9w_vsFIerZgckPbcm226QIOIDVprHFQE8"
+});
+
+
+
 // variables
 
 const cartBtn =document.querySelector('.cart-btn');
@@ -19,15 +28,21 @@ let buttonsDOM = [];
 class Products{
     async getProducts(){
         try{
-            let result = await fetch('products.json')
+
+            let contentful = await client.getEntries({
+              content_type: "comfyHouseProducts"
+            });
+            console.log(contentful.items);
+
+            let result = await fetch('products.json');
             let data = await result.json();
-            let products =data.items;
+            let products =contentful.items;
             products = products.map(item =>{
-                const {title,price} = item.fields;
-                const {id} = item.sys
+                const { title, price } = item.fields;
+                const { id } = item.sys
                 const image = item.fields.image.fields.file.url;
-                return {title,price,id,image}
-            })
+                return {title,price,id,image};
+            });
             return products;
             } catch (error){
                 console.log(error);
@@ -68,13 +83,11 @@ class UI {
             }
             
                 button.addEventListener('click',(event)=>{
-                    console.log(event);
                     event.target.innerText = "In Cart";
                     event.target.disabled = true;
 
                     // get product from products
                     let cartItem = {...Storage.getProduct(id), amount:1};
-                    console.log(cartItem);
                     
 
                     // add product to the cart
@@ -106,7 +119,7 @@ class UI {
             tempTotal  += item.price * item.amount;
             itemsTotal += item.amount;
         })
-        cartTotal.innerText = parseFloat(tempTotal.toFixed(2))
+        cartTotal.innerText = parseFloat(tempTotal.toFixed(2));
         cartItems.innerText = itemsTotal;
     }
     addCartItem(item){
@@ -144,6 +157,65 @@ class UI {
         cartOverlay.classList.remove("transparentBcg");
         cartDOM.classList.remove("showCart");
     }
+    cartLogic(){
+        // clear cart button
+        clearCartBtn.addEventListener('click',()=>{
+            this.clearCart();
+        });
+        // cart functionality
+        cartContent.addEventListener('click',event =>{
+            if (event.target.classList.contains("remove-item")) {
+              let removeItem = event.target;
+              let id = removeItem.dataset.id;
+              cartContent.removeChild(removeItem.parentElement.parentElement);
+              this.removeItem(id);
+            } else if (event.target.classList.contains("fa-chevron-up")) {
+              let addAmount = event.target;
+              let id = addAmount.dataset.id;
+              let tempItem = cart.find(item => item.id === id);
+              tempItem.amount = tempItem.amount + 1;
+              Storage.saveCart(cart);
+              this.setCartValues(cart);
+              addAmount.nextElementSibling.innerText = tempItem.amount;
+            } else if (event.target.classList.contains("fa-chevron-down")) {
+              let removeAmount = event.target;
+              let id = removeAmount.dataset.id;
+              let tempItem = cart.find(item => item.id === id);
+              tempItem.amount = tempItem.amount - 1;
+                if(tempItem.amount > 0){
+                    Storage.saveCart(cart);
+                    this.setCartValues(cart);
+                    removeAmount.previousElementSibling.innerText = tempItem.amount;    
+                }
+                else{
+                    cartContent.removeChild(removeAmount.parentElement.parentElement);
+                    this.removeItem(id);
+                }
+        
+              
+            }
+
+    });
+}
+    clearCart(){
+        let cartItems = cart.map(item => item.id);
+        cartItems.forEach(id => this.removeItem(id));
+        while(cartContent.children.length>0){
+            cartContent.removeChild(cartContent.children[0])
+        }
+        this.hideCart()
+    }
+    removeItem(id){
+        cart = cart.filter(item => item.id !==id);
+        this.setCartValues(cart);
+        Storage.saveCart(cart);
+        let button = this.getSingleButton(id);
+        button.disabled = false;
+        button.innerHTML = `<i class="fas fa-shopping-cart"></i>add to cart`
+    }
+    getSingleButton(id){
+        return buttonsDOM.find(button => button.dataset.id === id)
+    }
 }
 
 // local storage
@@ -176,6 +248,7 @@ document.addEventListener("DOMContentLoaded", ()=>{
     })
     .then(()=>{
         ui.getBagButtons();
+        ui.cartLogic();
     });
 
 });
