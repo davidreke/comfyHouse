@@ -1,254 +1,110 @@
-const client = contentful.createClient({
-  // This is the space ID. A space is like a project folder in Contentful terms
-  space: "xxy515yhhwmw",
-  // This is the access token for this space. Normally you get both ID and the token in the Contentful web app
-  accessToken: "eptdXUEkdx9w_vsFIerZgckPbcm226QIOIDVprHFQE8"
-});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Comfy House</title>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <!-- import font awesome -->
+    <script src="https://kit.fontawesome.com/d701820bd9.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    
+</body>
+</html>
+<body>
+    <!-- navbar -->
+    <nav class="navbar">
+        <div class="navbar-center">
+            <span class="nav-icon"><i class="fas fa-bars"></i></span>
+            <img src="./images/logo.svg" alt="Store Logo">
+            <div class="cart-btn">
+                <span class="nav-icon">
+                    <i class="fas fa-cart-plus"></i>
+                </span>
+                <div class="cart-items">0</div>
+            </div>
+        </div>
+    </nav>
+    <!-- end of navbar -->
 
 
+    <!-- Hero -->
 
-// variables
+    <header class="hero">
+        <div class="banner" style="background-image:url('images/hero-bcg.jep')">
+            <h1 class="banner-title">furniture collection</h1>
+            <button class="banner-btn">shop now</button>
+        </div>
 
-const cartBtn =document.querySelector('.cart-btn');
-const closeCartBtn = document.querySelector('.close-cart');
-const clearCartBtn = document.querySelector('.clear-cart');
-const cartDOM = document.querySelector('.cart');
-const cartOverlay = document.querySelector('.cart-overlay');
-const cartItems = document.querySelector('.cart-items');
-const cartTotal = document.querySelector('.cart-total');
-const cartContent = document.querySelector(".cart-content");
-const productsDOM = document.querySelector(".products-center");
+    </header>
 
-// cart totals
-let cart = [];
-// buttons
-let buttonsDOM = [];
+    <!-- end of Hero -->
 
-// getting the products
-class Products{
-    async getProducts(){
-        try{
+    <!-- products -->
 
-            let contentful = await client.getEntries({
-              content_type: "comfyHouseProducts"
-            });
-            console.log(contentful.items);
-
-            let result = await fetch('products.json');
-            let data = await result.json();
-            let products =contentful.items;
-            products = products.map(item =>{
-                const { title, price } = item.fields;
-                const { id } = item.sys
-                const image = item.fields.image.fields.file.url;
-                return {title,price,id,image};
-            });
-            return products;
-            } catch (error){
-                console.log(error);
-        }
-    }
-}
-
-// display products
-class UI {
-    displayProducts(products){
-        let result = '';
-        products.forEach(product =>{
-            result +=`<article class="product">
+    <section class="products">
+        <div class="section-title">
+            <h2>our products</h2>
+        </div>
+        <div class="products-center">
+            <!-- single product -->
+            <!-- used as reference, products are actually dynamically created by -->
+            <!-- <article class="product">
                 <div class="img-container">
-                    <img src=${product.image} alt="product" class="product-img">
-                    <button class="bag-btn" data-id=${product.id}>
+                    <img src="images/product-1.jpeg" alt="product" class="product-img">
+                    <button class="bag-btn" data-id="1">
                         <i class="fas fa-shopping-cart"></i>
                         add to bag
                     </button>
                 </div>
-                <h3>${product.title}</h3>
-                <h4>$${product.price}</h4>
-            </article>
-            
-            `;
-        })
-        productsDOM.innerHTML = result;
-    }
-    getBagButtons (){
-        const buttons = [...document.querySelectorAll('.bag-btn')];
-        buttonsDOM = buttons;
-        buttons.forEach(button =>{
-            let id = button.dataset.id;
-            let inCart = cart.find(item => item.id ===id); 
-            if(inCart){
-                button.innerText = "In Cart";
-                button.disabled = true;
-            }
-            
-                button.addEventListener('click',(event)=>{
-                    event.target.innerText = "In Cart";
-                    event.target.disabled = true;
+                <h3>queen bed</h3>
+                <h4>$16</h4>
+            </article> -->
+            <!-- end of single product -->
+        </div>
+    </section>
 
-                    // get product from products
-                    let cartItem = {...Storage.getProduct(id), amount:1};
-                    
+    <!-- end of products -->
 
-                    // add product to the cart
-
-                        cart =[...cart,cartItem];
-
-                    // save cart in local storage
-
-                    Storage.saveCart(cart)
-
-                    // set cart values
-
-                    this.setCartValues(cart);
-
-                    // display cart item
-
-                    this.addCartItem(cartItem);
-
-                    // show the cart
-                    this.showCart();
-                });
-            
-        })
-    }s
-    setCartValues(cart){
-        let tempTotal = 0;
-        let itemsTotal = 0;
-        cart.map(item => {
-            tempTotal  += item.price * item.amount;
-            itemsTotal += item.amount;
-        })
-        cartTotal.innerText = parseFloat(tempTotal.toFixed(2));
-        cartItems.innerText = itemsTotal;
-    }
-    addCartItem(item){
-        const div = document.createElement('div');
-        div.classList.add('cart-item');
-        div.innerHTML = `<img src=${item.image} alt="">
+    <!-- cart -->
+    <div class="cart-overlay">
+        <div class="cart">
+            <span class="close-cart">
+                <i class="fas fa-window-close"></i>
+            </span>
+            <h2>your cart</h2>
+            <div class="cart-content">
+                <!-- cart item -->
+                <!-- <div class="cart-item"> -->
+                    <!-- <img src="/cozyHouse/images/product-1.jpeg" alt="">
                     <div>
-                        <h4>${item.title}</h4>
-                        <h5>$${item.price}</h5>
-                        <span class="remove-item" data-id=${item.id}>remove</span>
+                        <h4>queen bed</h4>
+                        <h5>$9.00</h5>
+                        <span class="remove-item">remove</span>
                     </div>
                     <div>
-                        <i class="fas fa-chevron-up" data-id=${item.id}></i>
-                        <p class="item-amount">${item.amount}</p>
-                        <i class="fas fa-chevron-down" data-id=${item.id}></i>
-                    </div>`;
-                    cartContent.appendChild(div);
-                    
-    }
-    showCart(){
-        cartOverlay.classList.add("transparentBcg");
-        cartDOM.classList.add("showCart");
-    }
-    setupAPP(){
-        cart = Storage.getCart();
-        this.setCartValues(cart);
-        this.populateCart(cart);
-        cartBtn.addEventListener('click',this.showCart);
-        closeCartBtn.addEventListener('click',this.hideCart)
-    }
-    populateCart(cart){
-        cart.forEach(item => this.addCartItem(item));
-    }
-    hideCart(){
-        cartOverlay.classList.remove("transparentBcg");
-        cartDOM.classList.remove("showCart");
-    }
-    cartLogic(){
-        // clear cart button
-        clearCartBtn.addEventListener('click',()=>{
-            this.clearCart();
-        });
-        // cart functionality
-        cartContent.addEventListener('click',event =>{
-            if (event.target.classList.contains("remove-item")) {
-              let removeItem = event.target;
-              let id = removeItem.dataset.id;
-              cartContent.removeChild(removeItem.parentElement.parentElement);
-              this.removeItem(id);
-            } else if (event.target.classList.contains("fa-chevron-up")) {
-              let addAmount = event.target;
-              let id = addAmount.dataset.id;
-              let tempItem = cart.find(item => item.id === id);
-              tempItem.amount = tempItem.amount + 1;
-              Storage.saveCart(cart);
-              this.setCartValues(cart);
-              addAmount.nextElementSibling.innerText = tempItem.amount;
-            } else if (event.target.classList.contains("fa-chevron-down")) {
-              let removeAmount = event.target;
-              let id = removeAmount.dataset.id;
-              let tempItem = cart.find(item => item.id === id);
-              tempItem.amount = tempItem.amount - 1;
-                if(tempItem.amount > 0){
-                    Storage.saveCart(cart);
-                    this.setCartValues(cart);
-                    removeAmount.previousElementSibling.innerText = tempItem.amount;    
-                }
-                else{
-                    cartContent.removeChild(removeAmount.parentElement.parentElement);
-                    this.removeItem(id);
-                }
-        
-              
-            }
+                        <i class="fas fa-chevron-up"></i>
+                        <p class="item-amount">2</p>
+                        <i class="fas fa-chevron-down"></i>
+                    </div> -->
+                <!-- </div> -->
+                <!-- end of cart item -->
+            
+            </div>
+            <div class="cart-footer">
+                <h3>your total : $ <span class="cart-total">0</span></h3>
+                <button class="clear-cart banner-btn">clear cart</button>
+            </div>
+        </div>
+    </div>
 
-    });
-}
-    clearCart(){
-        let cartItems = cart.map(item => item.id);
-        cartItems.forEach(id => this.removeItem(id));
-        while(cartContent.children.length>0){
-            cartContent.removeChild(cartContent.children[0])
-        }
-        this.hideCart()
-    }
-    removeItem(id){
-        cart = cart.filter(item => item.id !==id);
-        this.setCartValues(cart);
-        Storage.saveCart(cart);
-        let button = this.getSingleButton(id);
-        button.disabled = false;
-        button.innerHTML = `<i class="fas fa-shopping-cart"></i>add to cart`
-    }
-    getSingleButton(id){
-        return buttonsDOM.find(button => button.dataset.id === id)
-    }
-}
-
-// local storage
-class Storage{
-    static saveProducts(products){
-        localStorage.setItem("products",JSON.stringify(products));
-
-    }
-    static getProduct(id){
-        let products = JSON.parse(localStorage.getItem('products'));
-        return products.find(product => product.id === id);
-    }
-    static saveCart(cart){
-        localStorage.setItem('cart',JSON.stringify(cart));
-    }
-    static getCart(){
-        return localStorage.getItem('cart')? JSON.parse(localStorage.getItem('cart')):[];
-    }
-}
-
-document.addEventListener("DOMContentLoaded", ()=>{
-    const ui = new UI();
-    const products = new Products();
-    // setup app
-    ui.setupAPP();
-
-    // get all products
-    products.getProducts().then(products => {ui.displayProducts(products);
-    Storage.saveProducts(products);
-    })
-    .then(()=>{
-        ui.getBagButtons();
-        ui.cartLogic();
-    });
-
-});
+    <!-- end of cart     -->
+    <!-- contentful -->
+    <script src="https://cdn.jsdelivr.net/npm/contentful@latest/dist/contentful.browser.min.js"></script>
+    <!-- js code -->
+    <script src="js/main.js"></script>    
+</body>
+</html>
